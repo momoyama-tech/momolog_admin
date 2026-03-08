@@ -13,7 +13,8 @@
 		{ href: '/', label: 'ダッシュボード' },
 		{ href: '/groups', label: '団体管理' },
 		{ href: '/videos', label: '動画一覧' },
-		{ href: '/users', label: 'ユーザー管理' }
+		{ href: '/users', label: 'ユーザー管理' },
+		{ href: '/themes', label: 'テーマ管理' }
 	];
 
 	async function logout() {

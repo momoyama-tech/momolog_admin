@@ -48,3 +48,17 @@ export interface Video {
 	createdAt: Date;
 }
 // ⚠️ isVisibleOnOfficial は存在しない。official表示はstatus="published"で制御する。
+
+export type ThemeType = 'bgm' | 'chromakey';
+
+export interface Theme {
+	id: string;
+	name: string;
+	description: string;
+	type: ThemeType;
+	mediaStoragePath: string;
+	active: boolean;
+	createdBy: string;
+	createdAt: Date;
+	updatedAt: Date;
+}
