@@ -57,6 +57,12 @@ service cloud.firestore {
       allow create, update, delete: if isAdmin();
     }
 
+    // テーマコレクション: ログイン済みユーザーは読み取り可、adminのみ書き込み可
+    match /themes/{themeId} {
+      allow read: if isSignedIn();
+      allow create, update, delete: if isAdmin();
+    }
+
     // YouTube認証情報: adminからは一切アクセス不可（サーバーサイドのみ）
     match /youtube_credentials/{groupId} {
       allow read, write: if false;
