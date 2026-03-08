@@ -13,6 +13,13 @@
 		bgm: 'bg-blue-100 text-blue-700',
 		chromakey: 'bg-green-100 text-green-700'
 	};
+
+	function formatDuration(seconds: number): string {
+		if (!seconds) return '-';
+		const m = Math.floor(seconds / 60);
+		const s = seconds % 60;
+		return m > 0 ? `${m}分${s.toString().padStart(2, '0')}秒` : `${s}秒`;
+	}
 </script>
 
 <div class="flex justify-between items-center mb-6">
@@ -32,6 +39,7 @@
 				<th class="text-left px-6 py-3 font-medium text-gray-600">テーマ名</th>
 				<th class="text-left px-6 py-3 font-medium text-gray-600">タイプ</th>
 				<th class="text-left px-6 py-3 font-medium text-gray-600">説明</th>
+				<th class="text-left px-6 py-3 font-medium text-gray-600">再生時間</th>
 				<th class="text-left px-6 py-3 font-medium text-gray-600">状態</th>
 			</tr>
 		</thead>
@@ -51,6 +59,7 @@
 						</span>
 					</td>
 					<td class="px-6 py-4 text-gray-600">{theme.description}</td>
+					<td class="px-6 py-4 text-gray-600">{formatDuration(theme.mediaDuration ?? 0)}</td>
 					<td class="px-6 py-4">
 						<span
 							class="text-xs px-2 py-1 rounded-full font-medium {theme.active
@@ -63,7 +72,7 @@
 				</tr>
 			{:else}
 				<tr>
-					<td colspan="4" class="px-6 py-10 text-center text-gray-400">テーマがありません</td>
+					<td colspan="5" class="px-6 py-10 text-center text-gray-400">テーマがありません</td>
 				</tr>
 			{/each}
 		</tbody>

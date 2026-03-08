@@ -57,6 +57,7 @@ export interface Theme {
 	description: string;
 	type: ThemeType;
 	mediaStoragePath: string;
+	mediaDuration?: number;
 	active: boolean;
 	createdBy: string;
 	createdAt: Date;

@@ -25,6 +25,23 @@
 		if (file) newMediaFile = file;
 	}
 
+	function getMediaDuration(file: File): Promise<number> {
+		return new Promise((resolve) => {
+			const url = URL.createObjectURL(file);
+			const el = data.theme.type === 'bgm' ? new Audio() : document.createElement('video');
+			el.preload = 'metadata';
+			el.onloadedmetadata = () => {
+				resolve(Math.round(el.duration));
+				URL.revokeObjectURL(url);
+			};
+			el.onerror = () => {
+				resolve(0);
+				URL.revokeObjectURL(url);
+			};
+			el.src = url;
+		});
+	}
+
 	function getAcceptType(): string {
 		return data.theme.type === 'bgm' ? 'audio/*' : 'video/*';
 	}
@@ -66,6 +83,8 @@
 		uploadProgress = 0;
 
 		try {
+			const duration = await getMediaDuration(newMediaFile);
+
 			// Determine new storage path in case file extension changes
 			const newExt = newMediaFile.name.substring(newMediaFile.name.lastIndexOf('.'));
 			const storagePath = `themes/${data.theme.id}/media${newExt}`;
@@ -85,17 +104,12 @@
 				);
 			});
 
-			// Update Firestore doc if storage path changed
-			if (storagePath !== data.theme.mediaStoragePath) {
-				await updateDoc(doc(db, 'themes', data.theme.id), {
-					mediaStoragePath: storagePath,
-					updatedAt: new Date()
-				});
-			} else {
-				await updateDoc(doc(db, 'themes', data.theme.id), {
-					updatedAt: new Date()
-				});
-			}
+			// Update Firestore doc
+			await updateDoc(doc(db, 'themes', data.theme.id), {
+				mediaStoragePath: storagePath,
+				mediaDuration: duration,
+				updatedAt: new Date()
+			});
 
 			alert('メディアを差し替えました。');
 			newMediaFile = null;

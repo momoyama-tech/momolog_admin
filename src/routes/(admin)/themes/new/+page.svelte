@@ -19,6 +19,23 @@
 		if (file) mediaFile = file;
 	}
 
+	function getMediaDuration(file: File): Promise<number> {
+		return new Promise((resolve) => {
+			const url = URL.createObjectURL(file);
+			const el = themeType === 'bgm' ? new Audio() : document.createElement('video');
+			el.preload = 'metadata';
+			el.onloadedmetadata = () => {
+				resolve(Math.round(el.duration));
+				URL.revokeObjectURL(url);
+			};
+			el.onerror = () => {
+				resolve(0);
+				URL.revokeObjectURL(url);
+			};
+			el.src = url;
+		});
+	}
+
 	function getAcceptType(): string {
 		return themeType === 'bgm' ? 'audio/*' : 'video/*';
 	}
@@ -52,11 +69,14 @@
 		uploadProgress = 0;
 
 		try {
+			const duration = await getMediaDuration(mediaFile);
+
 			const docRef = await addDoc(collection(db, 'themes'), {
 				name: name.trim(),
 				description: description.trim(),
 				type: themeType,
 				mediaStoragePath: '',
+				mediaDuration: duration,
 				active: true,
 				createdBy: $currentUser.uid,
 				createdAt: serverTimestamp(),
