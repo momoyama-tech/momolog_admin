@@ -45,19 +45,19 @@
 {#if loading}
 	<div class="text-center py-12 text-gray-500">読み込み中...</div>
 {:else}
-	<div class="grid grid-cols-3 gap-6">
-		<div class="bg-white p-6 rounded-lg shadow-sm">
+	<div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+		<a href="/groups" class="block bg-white p-6 rounded-lg shadow-sm transition-all hover:shadow-md hover:-translate-y-1">
 			<p class="text-sm text-gray-500">団体数</p>
 			<p class="text-3xl font-bold mt-1">{groupCount}</p>
-		</div>
-		<div class="bg-white p-6 rounded-lg shadow-sm">
+		</a>
+		<a href="/videos" class="block bg-white p-6 rounded-lg shadow-sm transition-all hover:shadow-md hover:-translate-y-1">
 			<p class="text-sm text-gray-500">動画数</p>
 			<p class="text-3xl font-bold mt-1">{videoCount}</p>
-		</div>
-		<div class="bg-white p-6 rounded-lg shadow-sm">
+		</a>
+		<a href="/users" class="block bg-white p-6 rounded-lg shadow-sm transition-all hover:shadow-md hover:-translate-y-1">
 			<p class="text-sm text-gray-500">ユーザー数</p>
 			<p class="text-3xl font-bold mt-1">{userCount}</p>
-		</div>
+		</a>
 	</div>
 
 	{#if groupCount === 0 && videoCount === 0 && userCount === 0}
