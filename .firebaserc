@@ -1,0 +1,6 @@
+{
+  "projects": {
+    "default": "momolog-develop",
+    "production": "momolog-production"
+  }
+}

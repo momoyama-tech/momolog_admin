@@ -1,0 +1,65 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ログイン済みかどうかを確認するヘルパー
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // ユーザー情報を取得するヘルパー
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    // adminまたはsuperadminロールを持つユーザーかどうかを確認するヘルパー
+    function isAdmin() {
+      return isSignedIn() &&
+        (getUserData().role == "admin" || getUserData().role == "superadmin");
+    }
+
+    // superadminロールを持つユーザーかどうかを確認するヘルパー
+    function isSuperAdmin() {
+      return isSignedIn() && getUserData().role == "superadmin";
+    }
+
+    // 団体コレクション: adminのみ書き込み可、読み取りはログイン済みユーザー
+    match /groups/{groupId} {
+      allow read: if isSignedIn();
+      allow create, update, delete: if isAdmin();
+    }
+
+    // ユーザーコレクション
+    match /users/{userId} {
+      // 読み取り: 自分自身またはadmin
+      allow read: if isSignedIn() && (request.auth.uid == userId || isAdmin());
+
+      // 作成: 自分自身のドキュメントは作成可能（初回ログイン時）、またはadmin
+      allow create: if isSignedIn() && request.auth.uid == userId || isAdmin();
+
+      // 更新: 権限に応じて更新可能なフィールドを制限
+      allow update: if isSignedIn() && (
+        // superadminは全てのフィールドを更新可能
+        isSuperAdmin() ||
+        // adminはrole以外のフィールドを更新可能
+        (isAdmin() && !request.resource.data.diff(resource.data).affectedKeys().has('role')) ||
+        // 一般ユーザーは自分の情報のうち、roleとgroupIds以外を更新可能
+        (request.auth.uid == userId && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'groupIds']))
+      );
+
+      // 削除: superadminのみ
+      allow delete: if isSuperAdmin();
+    }
+
+    // 動画コレクション: adminのみ書き込み可、読み取りはログイン済みユーザー
+    match /videos/{videoId} {
+      allow read: if isSignedIn();
+      allow create, update, delete: if isAdmin();
+    }
+
+    // YouTube認証情報: adminからは一切アクセス不可（サーバーサイドのみ）
+    match /youtube_credentials/{groupId} {
+      allow read, write: if false;
+    }
+  }
+}

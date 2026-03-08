@@ -19,10 +19,17 @@ export interface Group {
 	};
 }
 
+export type UserRole = 'user' | 'admin' | 'superadmin';
+
 export interface AppUser {
 	id: string;
+	email: string;
+	displayName: string;
+	photoURL?: string;
 	groupIds: string[];
-	role: 'user' | 'admin';
+	role: UserRole;
+	createdAt?: Date;
+	lastLoginAt?: Date;
 }
 
 export interface Video {
@@ -40,3 +47,4 @@ export interface Video {
 	youtubeError?: string;
 	createdAt: Date;
 }
+// ⚠️ isVisibleOnOfficial は存在しない。official表示はstatus="published"で制御する。

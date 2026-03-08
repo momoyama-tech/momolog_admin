@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { PageData } from './$types';
-	import type { VideoStatus } from '$lib/types';
+	import type { VideoStatus, UserRole } from '$lib/types';
 
 	let { data } = $props<{ data: PageData }>();
 
@@ -18,6 +18,18 @@
 		published: 'text-green-600',
 		failed: 'text-red-600',
 		rejected: 'text-gray-500'
+	};
+
+	const roleLabels: Record<UserRole, string> = {
+		user: '一般ユーザー',
+		admin: '管理者',
+		superadmin: 'スーパー管理者'
+	};
+
+	const roleColors: Record<UserRole, string> = {
+		user: 'text-gray-600',
+		admin: 'text-blue-600',
+		superadmin: 'text-purple-600'
 	};
 </script>
 
@@ -43,7 +55,8 @@
 		<table class="w-full text-sm">
 			<thead class="bg-gray-50 border-b">
 				<tr>
-					<th class="text-left px-4 py-3 font-medium text-gray-600">ユーザーID</th>
+					<th class="text-left px-4 py-3 font-medium text-gray-600">ユーザー名</th>
+					<th class="text-left px-4 py-3 font-medium text-gray-600">メールアドレス</th>
 					<th class="text-left px-4 py-3 font-medium text-gray-600">権限</th>
 					<th class="text-left px-4 py-3 font-medium text-gray-600">所属団体数</th>
 				</tr>
@@ -51,19 +64,29 @@
 			<tbody>
 				{#each data.users as user}
 					<tr class="border-b hover:bg-gray-50">
-						<td class="px-4 py-3 font-mono text-xs">{user.id}</td>
 						<td class="px-4 py-3">
-							<span
-								class={user.role === 'admin' ? 'text-blue-600 font-medium' : 'text-gray-600'}
-							>
-								{user.role ?? 'user'}
+							<div class="flex items-center gap-2">
+								{#if user.photoURL}
+									<img
+										src={user.photoURL}
+										alt={user.displayName}
+										class="w-6 h-6 rounded-full"
+									/>
+								{/if}
+								<span class="font-medium">{user.displayName || 'Unknown'}</span>
+							</div>
+						</td>
+						<td class="px-4 py-3 text-gray-600 text-xs">{user.email || '—'}</td>
+						<td class="px-4 py-3">
+							<span class="{roleColors[user.role ?? 'user']} font-medium">
+								{roleLabels[user.role ?? 'user']}
 							</span>
 						</td>
 						<td class="px-4 py-3 text-gray-600">{user.groupIds?.length ?? 0}</td>
 					</tr>
 				{:else}
 					<tr>
-						<td colspan="3" class="px-4 py-6 text-center text-gray-400"
+						<td colspan="4" class="px-4 py-6 text-center text-gray-400"
 							>所属ユーザーがいません</td
 						>
 					</tr>
