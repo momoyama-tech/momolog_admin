@@ -205,7 +205,25 @@ npm run dev
 # → http://localhost:5173 でログイン画面が表示されればOK
 ```
 
-### 7. 初回コミット
+### 7. テストユーザーを作成
+
+開発サーバーを起動した状態で、以下のいずれかの方法でテストユーザーを作成します：
+
+**方法1: サインアップページから作成（推奨）**
+
+1. http://localhost:5173/signup にアクセス
+2. メールアドレスとパスワード（6文字以上）を入力
+3. 「ユーザーを作成」ボタンをクリック
+4. 自動的にログインページにリダイレクトされます
+
+**方法2: Firebaseコンソールから作成**
+
+1. [Firebase Console](https://console.firebase.google.com/) にアクセス
+2. プロジェクトを選択
+3. Authentication → Users → Add user
+4. メールアドレスとパスワードを入力して作成
+
+### 8. 初回コミット
 
 ```bash
 git add .
@@ -937,9 +955,46 @@ export const load: PageLoad = async () => {
 
 ---
 
+## CI/CD
+
+### GitHub Actions
+
+プロジェクトには2つのワークフローが設定されています：
+
+**1. CI（継続的インテグレーション）**
+- トリガー: `main`, `develop` ブランチへのpush、PR作成時
+- 実行内容:
+  - ESLintによるコードチェック
+  - Prettierによるフォーマットチェック
+  - svelte-checkによる型チェック
+  - ビルドテスト
+
+**2. Deploy（Vercelへの自動デプロイ）**
+- トリガー: `main` ブランチへのpush
+- 実行内容:
+  - Vercel本番環境への自動デプロイ
+
+### デプロイ方法
+
+詳細は `.github/DEPLOYMENT.md` を参照してください。
+
+**Vercel（推奨）**
+- mainブランチへのpushで自動デプロイ
+- プレビュー環境の自動作成
+- カスタムドメイン設定可能
+
+**Firebase Hosting（代替案）**
+```bash
+npm run build
+firebase deploy --only hosting
+```
+
+---
+
 ## TODO（未決定事項）
 
-- [ ] SvelteKitプロジェクト作成・基本構成
+- [x] SvelteKitプロジェクト作成・基本構成
+- [x] 全画面の実装
+- [x] CI/CD設定
 - [ ] 管理者権限の階層設計（スーパー管理者 vs 一般管理者など）
-- [ ] 動画一覧画面の詳細設計（ステータス管理含む）
-- [ ] ホスティング先の確定（Vercel / Firebase Hosting）
+- [ ] E2Eテストの実装

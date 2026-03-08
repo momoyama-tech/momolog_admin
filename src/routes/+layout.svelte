@@ -6,9 +6,10 @@
 
 	let { children } = $props();
 
-	// 未認証の場合はログインページへリダイレクト
+	// 未認証の場合はログインページへリダイレクト（/login と /signup は除外）
 	$effect(() => {
-		if (!$authLoading && !$currentUser && $page.url.pathname !== '/login') {
+		const publicPaths = ['/login', '/signup'];
+		if (!$authLoading && !$currentUser && !publicPaths.includes($page.url.pathname)) {
 			goto('/login');
 		}
 	});

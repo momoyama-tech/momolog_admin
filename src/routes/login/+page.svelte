@@ -50,9 +50,12 @@
 		<button
 			onclick={handleLogin}
 			disabled={loading}
-			class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+			class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 disabled:opacity-50 mb-3"
 		>
 			{loading ? 'ログイン中...' : 'ログイン'}
 		</button>
+		<a href="/signup" class="block text-center text-sm text-gray-600 hover:underline">
+			テストユーザーを作成
+		</a>
 	</div>
 </div>
