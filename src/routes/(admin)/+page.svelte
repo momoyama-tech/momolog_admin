@@ -64,8 +64,7 @@
 		<div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-6">
 			<p class="text-blue-800 text-sm font-medium mb-2">データがまだありません</p>
 			<p class="text-blue-700 text-sm">
-				テストデータを作成するには、<a href="/groups/new" class="underline">団体を作成</a
-				>してください。
+				管理者に連絡して、初期設定を依頼してください。
 			</p>
 		</div>
 	{/if}

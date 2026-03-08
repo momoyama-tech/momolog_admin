@@ -15,12 +15,6 @@
 
 <div class="flex justify-between items-center mb-6">
 	<h2 class="text-2xl font-bold">団体管理</h2>
-	<a
-		href="/groups/new"
-		class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm"
-	>
-		+ 新規作成
-	</a>
 </div>
 
 <div class="bg-white rounded-lg shadow-sm overflow-hidden">
