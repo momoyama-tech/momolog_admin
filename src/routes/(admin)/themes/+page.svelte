@@ -1,8 +1,14 @@
 <script lang="ts">
+	import { db, storage } from '$lib/firebase';
+	import { doc, updateDoc } from 'firebase/firestore';
+	import { ref, getDownloadURL } from 'firebase/storage';
 	import type { PageData } from './$types';
-	import type { ThemeType } from '$lib/types';
+	import type { Theme, ThemeType } from '$lib/types';
 
 	let { data } = $props<{ data: PageData }>();
+
+	let updatingDurations = $state(false);
+	let updateMessage = $state('');
 
 	const themeTypeLabels: Record<ThemeType, string> = {
 		bgm: 'BGM',
@@ -20,17 +26,82 @@
 		const s = seconds % 60;
 		return m > 0 ? `${m}分${s.toString().padStart(2, '0')}秒` : `${s}秒`;
 	}
+
+	function getMediaDuration(url: string, type: ThemeType): Promise<number> {
+		return new Promise((resolve) => {
+			const el = type === 'bgm' ? new Audio() : document.createElement('video');
+			el.preload = 'metadata';
+			el.onloadedmetadata = () => {
+				resolve(Math.round(el.duration));
+			};
+			el.onerror = () => resolve(0);
+			el.src = url;
+		});
+	}
+
+	async function updateAllDurations() {
+		updatingDurations = true;
+		updateMessage = '';
+		let updated = 0;
+
+		try {
+			const targets = data.themes.filter(
+				(t: Theme) => t.mediaStoragePath && !t.mediaDuration
+			);
+
+			if (targets.length === 0) {
+				updateMessage = 'すべてのテーマに再生時間が設定済みです';
+				updatingDurations = false;
+				return;
+			}
+
+			updateMessage = `${targets.length}件のテーマを処理中...`;
+
+			for (const theme of targets) {
+				try {
+					const url = await getDownloadURL(ref(storage, theme.mediaStoragePath));
+					const duration = await getMediaDuration(url, theme.type);
+					if (duration > 0) {
+						await updateDoc(doc(db, 'themes', theme.id), { mediaDuration: duration });
+						theme.mediaDuration = duration;
+						updated++;
+					}
+				} catch (e) {
+					console.warn(`Failed to get duration for ${theme.name}:`, e);
+				}
+			}
+
+			updateMessage = `${updated}件の再生時間を更新しました`;
+		} catch (e) {
+			updateMessage = 'エラーが発生しました';
+		} finally {
+			updatingDurations = false;
+		}
+	}
 </script>
 
 <div class="flex justify-between items-center mb-6">
 	<h2 class="text-2xl font-bold">テーマ管理</h2>
-	<a
-		href="/themes/new"
-		class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
-	>
-		+ 新規テーマ
-	</a>
+	<div class="flex items-center gap-3">
+		<button
+			onclick={updateAllDurations}
+			disabled={updatingDurations}
+			class="px-3 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm disabled:opacity-50"
+		>
+			{updatingDurations ? '更新中...' : '再生時間を一括更新'}
+		</button>
+		<a
+			href="/themes/new"
+			class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
+		>
+			+ 新規テーマ
+		</a>
+	</div>
 </div>
+
+{#if updateMessage}
+	<div class="mb-4 rounded bg-blue-50 px-4 py-2 text-sm text-blue-700">{updateMessage}</div>
+{/if}
 
 <div class="bg-white rounded-lg shadow-sm overflow-x-auto">
 	<table class="w-full text-sm min-w-[600px]">
