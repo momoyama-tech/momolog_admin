@@ -58,6 +58,7 @@ export interface Theme {
 	type: ThemeType;
 	mediaStoragePath: string;
 	mediaDuration?: number;
+	originalAudioVolume?: number;
 	active: boolean;
 	createdBy: string;
 	createdAt: Date;

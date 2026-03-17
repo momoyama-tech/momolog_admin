@@ -10,6 +10,7 @@
 	let description = $state('');
 	let themeType = $state<ThemeType>('bgm');
 	let mediaFile = $state<File | null>(null);
+	let originalAudioVolume = $state(1.0);
 	let saving = $state(false);
 	let uploadProgress = $state(0);
 
@@ -77,6 +78,7 @@
 				type: themeType,
 				mediaStoragePath: '',
 				mediaDuration: duration,
+				originalAudioVolume,
 				active: true,
 				createdBy: $currentUser.uid,
 				createdAt: serverTimestamp(),
@@ -150,6 +152,22 @@
 				placeholder="例: 明るいポップな雰囲気のBGM"
 				class="w-full border rounded px-3 py-2 text-sm"
 			/>
+		</div>
+
+		<div>
+			<label for="audio-volume" class="block text-sm font-medium text-gray-700 mb-1">
+				元動画の音量: {Math.round(originalAudioVolume * 100)}%
+			</label>
+			<input
+				id="audio-volume"
+				type="range"
+				min="0"
+				max="2"
+				step="0.1"
+				bind:value={originalAudioVolume}
+				class="w-full"
+			/>
+			<p class="text-xs text-gray-400 mt-1">100% = 調整なし（デフォルト）</p>
 		</div>
 
 		<div>

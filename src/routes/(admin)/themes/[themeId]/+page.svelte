@@ -11,6 +11,7 @@
 	// Edit form state
 	let name = $state(data.theme.name);
 	let description = $state(data.theme.description);
+	let originalAudioVolume = $state(data.theme.originalAudioVolume ?? 1.0);
 	let isUpdating = $state(false);
 
 	// Media state
@@ -65,7 +66,7 @@
 		isUpdating = true;
 		try {
 			const themeRef = doc(db, 'themes', data.theme.id);
-			await updateDoc(themeRef, { name: name.trim(), description: description.trim() });
+			await updateDoc(themeRef, { name: name.trim(), description: description.trim(), originalAudioVolume });
 			await invalidateAll();
 			alert('更新しました');
 		} catch (error) {
@@ -198,6 +199,22 @@
 					bind:value={description}
 					class="w-full border rounded px-3 py-2 text-sm"
 				></textarea>
+			</div>
+
+			<div>
+				<label for="audio-volume" class="block text-sm font-medium text-gray-700 mb-1">
+					元動画の音量: {Math.round(originalAudioVolume * 100)}%
+				</label>
+				<input
+					id="audio-volume"
+					type="range"
+					min="0"
+					max="2"
+					step="0.1"
+					bind:value={originalAudioVolume}
+					class="w-full"
+				/>
+				<p class="text-xs text-gray-400 mt-1">100% = 調整なし（デフォルト）</p>
 			</div>
 		</div>
 
